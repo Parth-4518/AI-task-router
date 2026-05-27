@@ -1,10 +1,16 @@
-node_modules
+# Dependencies
 node_modules/
-**/node_modules
 **/node_modules/
+
+# Build outputs
 dist/
 ui/storybook-static/
+
+# Environment
 .env
+.env.local
+
+# Misc
 *.tsbuildinfo
 drizzle/meta/
 .vite/
@@ -16,8 +22,15 @@ data/
 tmp-*
 cli/tmp/
 
-# Scratch/seed scripts (but not scripts/ dir)
-check-*.mjs
+# Logs
+*.log
+server.log
+tunnel.log
+
+# Large data files
+*.db
+__pycache__/
+.drizzle/
 !scripts/check-*.mjs
 new-agent*.json
 newcompany.json
