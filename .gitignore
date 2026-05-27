@@ -31,6 +31,9 @@ tunnel.log
 *.db
 __pycache__/
 .drizzle/
+
+# GitHub Actions (token needs workflow scope)
+.github/workflows/
 !scripts/check-*.mjs
 new-agent*.json
 newcompany.json
