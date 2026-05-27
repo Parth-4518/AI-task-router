@@ -1,0 +1,1 @@
+export { DocStore } from './store';

@@ -60,7 +60,7 @@ function RunDetailPreview({
   density: TranscriptDensity;
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-background/80 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
+    <div className="overflow-hidden rounded-xl border border-border/70 bg-background/80 shadow-[0_24px_60px_var(--shadow-tint)]">
       <div className="border-b border-border/60 bg-background/90 px-5 py-4">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline" className="uppercase tracking-[0.18em] text-[10px]">
@@ -75,7 +75,7 @@ function RunDetailPreview({
           Transcript ({runTranscriptFixtureEntries.length})
         </div>
       </div>
-      <div className="max-h-[720px] overflow-y-auto bg-[radial-gradient(circle_at_top_left,rgba(8,145,178,0.08),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(245,158,11,0.10),transparent_28%)] p-5">
+      <div className="max-h-[720px] overflow-y-auto bg-[radial-gradient(circle_at_top_left,var(--accent-tint-cyan-subtle),transparent_36%),radial-gradient(circle_at_bottom_right,var(--accent-tint-amber-subtle),transparent_28%)] p-5">
         <RunTranscriptView
           entries={runTranscriptFixtureEntries}
           mode={mode}
@@ -149,7 +149,7 @@ function DashboardPreview({
   return (
     <div className="max-w-md">
       <div className={cn(
-        "flex h-[320px] flex-col overflow-hidden rounded-xl border shadow-[0_20px_40px_rgba(15,23,42,0.10)]",
+        "flex h-[320px] flex-col overflow-hidden rounded-xl border shadow-[0_20px_40px_var(--shadow-tint-strong)]",
         streaming
           ? "border-cyan-500/25 bg-cyan-500/[0.04]"
           : "border-border bg-background/75",

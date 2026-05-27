@@ -19,3 +19,7 @@ export { llmRoutes } from "./llms.js";
 export { accessRoutes } from "./access.js";
 export { instanceSettingsRoutes } from "./instance-settings.js";
 export { instanceDatabaseBackupRoutes } from "./instance-database-backups.js";
+export { chatRouterRoutes } from "./chat-router.js";
+export { enhancedChatRouterRoutes } from "./enhanced-chat-router.js";
+export { helloWorldRoutes } from "./hello-world.js";
+export { helloWorldPreviewRoutes } from "./hello-world-preview.js";

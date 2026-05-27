@@ -25,6 +25,7 @@ import { secretRoutes } from "./routes/secrets.js";
 import { costRoutes } from "./routes/costs.js";
 import { activityRoutes } from "./routes/activity.js";
 import { dashboardRoutes } from "./routes/dashboard.js";
+import { agentAnalyticsRoutes } from "./routes/agent-analytics.js";
 import { userProfileRoutes } from "./routes/user-profiles.js";
 import { sidebarBadgeRoutes } from "./routes/sidebar-badges.js";
 import { sidebarPreferenceRoutes } from "./routes/sidebar-preferences.js";
@@ -40,9 +41,13 @@ import { assetRoutes } from "./routes/assets.js";
 import { accessRoutes } from "./routes/access.js";
 import { pluginRoutes } from "./routes/plugins.js";
 import { adapterRoutes } from "./routes/adapters.js";
+import { chatRouterRoutes } from "./routes/chat-router.js";
+import { enhancedChatRouterRoutes } from "./routes/enhanced-chat-router.js";
+import { helloWorldRoutes } from "./routes/hello-world.js";
+import { helloWorldPreviewRoutes } from "./routes/hello-world-preview.js";
+import { chatbotStaticRoutes } from "./routes/chatbot-static.js";
 import { pluginUiStaticRoutes } from "./routes/plugin-ui-static.js";
 import { applyUiBranding } from "./ui-branding.js";
-import { logger } from "./middleware/logger.js";
 import { DEFAULT_LOCAL_PLUGIN_DIR, pluginLoader } from "./services/plugin-loader.js";
 import { createPluginWorkerManager, type PluginWorkerManager } from "./services/plugin-worker-manager.js";
 import { createPluginJobScheduler } from "./services/plugin-job-scheduler.js";
@@ -59,6 +64,7 @@ import { pluginRegistryService } from "./services/plugin-registry.js";
 import { createHostClientHandlers } from "@paperclipai/plugin-sdk";
 import type { BetterAuthSessionResult } from "./auth/better-auth.js";
 import { createCachedViteHtmlRenderer } from "./vite-html-renderer.js";
+import { logger } from "./middleware/logger.js";
 
 type UiMode = "none" | "static" | "vite-dev";
 const FEEDBACK_EXPORT_FLUSH_INTERVAL_MS = 5_000;
@@ -206,6 +212,7 @@ export async function createApp(
   api.use(costRoutes(db, { pluginWorkerManager: workerManager }));
   api.use(activityRoutes(db));
   api.use(dashboardRoutes(db));
+  api.use(agentAnalyticsRoutes(db));
   api.use(userProfileRoutes(db));
   api.use(sidebarBadgeRoutes(db));
   api.use(sidebarPreferenceRoutes(db));
@@ -285,6 +292,34 @@ export async function createApp(
     ),
   );
   api.use(adapterRoutes());
+  api.use(chatRouterRoutes(db));
+  api.use(helloWorldRoutes(db));
+  api.use(helloWorldPreviewRoutes());
+  app.use(chatbotStaticRoutes());
+
+  // Serve chat UI at /chat
+  const chatUiPath = path.join(process.cwd(), "public", "chatbot.html");
+  if (fs.existsSync(chatUiPath)) {
+    app.get("/chat", (req, res) => {
+      res.sendFile(chatUiPath);
+    });
+  }
+
+  // SPA fallback - serve index.html for /issues/* and any other non-API routes
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api") || req.path.startsWith("/chat") || req.path.startsWith("/assets")) {
+      return next();
+    }
+    // For /issues/:id and other SPA routes, serve index.html
+    if (req.accepts("html")) {
+      const indexPath = path.join(process.cwd(), "..", "index.html");
+      if (fs.existsSync(indexPath)) {
+        return res.sendFile(indexPath);
+      }
+    }
+    next();
+  });
+  api.use(enhancedChatRouterRoutes(db));
   api.use(
     accessRoutes(db, {
       deploymentMode: opts.deploymentMode,
@@ -353,7 +388,23 @@ export async function createApp(
           .end(indexHtml);
       });
     } else {
-      console.warn("[paperclip] UI dist not found; running in API-only mode");
+      // Fallback: serve custom index.html if built UI doesn't exist
+      const customIndexPath = path.resolve(__dirname, "../../index.html");
+      if (fs.existsSync(customIndexPath)) {
+        const indexHtml = fs.readFileSync(customIndexPath, "utf-8");
+        app.get("/", (_req, res) => {
+          res.status(200).set("Content-Type", "text/html").end(indexHtml);
+        });
+        // SPA fallback for /issues/* and other routes
+        app.get(/.*/, (req, res) => {
+          if (req.path.startsWith("/api") || req.path.startsWith("/chat") || req.path.startsWith("/assets")) {
+            return res.status(404).end();
+          }
+          res.status(200).set("Content-Type", "text/html").end(indexHtml);
+        });
+      } else {
+        console.warn("[paperclip] UI dist not found; running in API-only mode");
+      }
     }
   }
 

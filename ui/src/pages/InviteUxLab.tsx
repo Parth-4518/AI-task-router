@@ -109,7 +109,7 @@ function LabSection({
   return (
     <section
       className={cn(
-        "rounded-[28px] border border-border/70 bg-background/80 p-4 shadow-[0_24px_60px_rgba(15,23,42,0.08)] sm:p-5",
+        "rounded-[28px] border border-border/70 bg-background/80 p-4 shadow-[0_24px_60px_var(--shadow-tint)] sm:p-5",
         accentClassName,
       )}
     >
@@ -168,10 +168,10 @@ function InviteLandingShell({
   right: ReactNode;
 }) {
   return (
-    <div className="overflow-hidden rounded-[28px] border border-zinc-800 bg-zinc-950 shadow-[0_30px_80px_rgba(2,6,23,0.55)]">
-      <div className="grid gap-px bg-zinc-800 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
-        <section className={cn(panelClassName, "space-y-6 bg-zinc-950")}>{left}</section>
-        <section className={cn(panelClassName, "h-full bg-zinc-950")}>{right}</section>
+    <div className="overflow-hidden rounded-[28px] border border-border bg-background shadow-[0_30px_80px_var(--shadow-tint-heavy)]">
+      <div className="grid gap-px border-border lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
+        <section className={cn(panelClassName, "space-y-6 bg-background")}>{left}</section>
+        <section className={cn(panelClassName, "h-full bg-background")}>{right}</section>
       </div>
     </div>
   );
@@ -451,7 +451,7 @@ function InviteResultPreview({
 
 function AuthScreenPreview({ mode, error }: { mode: "sign_in" | "sign_up"; error?: string }) {
   return (
-    <div className="overflow-hidden rounded-[28px] border border-border/70 bg-background shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
+    <div className="overflow-hidden rounded-[28px] border border-border/70 bg-background shadow-[0_24px_60px_var(--shadow-tint)]">
       <div className="grid gap-px bg-border/60 md:grid-cols-2">
         <div className="flex min-h-[420px] flex-col justify-center bg-background px-8 py-10">
           <div className="mx-auto w-full max-w-md">
@@ -507,13 +507,13 @@ function AuthScreenPreview({ mode, error }: { mode: "sign_in" | "sign_up"; error
             </div>
           </div>
         </div>
-        <div className="hidden min-h-[420px] items-center justify-center bg-[radial-gradient(circle_at_top,rgba(8,145,178,0.18),transparent_48%),linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,1))] px-8 py-10 md:flex">
-          <div className="max-w-sm space-y-4 text-zinc-200">
-            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-500/[0.08] px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-cyan-200">
+        <div className="hidden min-h-[420px] items-center justify-center bg-[radial-gradient(circle_at_top,var(--accent-tint-cyan),transparent_48%),linear-gradient(180deg,var(--shadow-tint-strong),var(--background))] px-8 py-10 md:flex">
+          <div className="max-w-sm space-y-4 text-foreground">
+            <div className="inline-flex items-center gap-2 rounded-full border border-info/30 bg-info/[0.08] px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-info">
               Auth preview
             </div>
             <div className="text-2xl font-semibold">Side-by-side signup styling review</div>
-            <p className="text-sm leading-6 text-zinc-400">
+            <p className="text-sm leading-6 text-muted-foreground">
               This frame mirrors the production auth surface so spacing, label density, button treatments, and desktop composition are easy to compare.
             </p>
           </div>
@@ -697,7 +697,7 @@ function CompanyInvitesPreview() {
 export function InviteUxLab() {
   return (
     <div className="space-y-6">
-      <div className="overflow-hidden rounded-[32px] border border-border/70 bg-[linear-gradient(135deg,rgba(8,145,178,0.10),transparent_28%),linear-gradient(180deg,rgba(245,158,11,0.10),transparent_44%),var(--background)] shadow-[0_30px_80px_rgba(15,23,42,0.10)]">
+      <div className="overflow-hidden rounded-[32px] border border-border/70 bg-[linear-gradient(135deg,rgba(8,145,178,0.10),transparent_28%),linear-gradient(180deg,rgba(245,158,11,0.10),transparent_44%),var(--background)] shadow-[0_30px_80px_var(--shadow-tint-strong)]">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_320px]">
           <div className="p-6 sm:p-7">
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/25 bg-cyan-500/[0.08] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-cyan-700 dark:text-cyan-300">

@@ -274,7 +274,7 @@ export function InboxIssueTrailingColumns({
 
         if (column === "project") {
           if (projectName) {
-            const accentColor = projectColor ?? "#64748b";
+            const accentColor = projectColor ?? "var(--default-project-secondary)";
             return (
               <span
                 key={column}

@@ -1333,7 +1333,7 @@ function LatestRunCard({ runs, agentId }: { runs: HeartbeatRun[]; agentId: strin
         to={`/agents/${agentId}/runs/${run.id}`}
         className={cn(
           "block border rounded-lg p-4 space-y-2 w-full no-underline transition-colors hover:bg-muted/50 cursor-pointer",
-          isLive ? "border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.08)]" : "border-border"
+          isLive ? "border-cyan-500/30 shadow-[0_0_12px_color-mix(in oklab, var(--status-info) 8%, transparent)]" : "border-border"
         )}
       >
         <div className="flex items-center gap-2">

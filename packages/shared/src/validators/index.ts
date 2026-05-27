@@ -437,3 +437,10 @@ export {
   type SetPluginState,
   type ListPluginState,
 } from "./plugin.js";
+
+export {
+  chatRouteRequestSchema,
+  chatRouteResponseSchema,
+  type ChatRouteRequest,
+  type ChatRouteResponse,
+} from "./chat-router.js";

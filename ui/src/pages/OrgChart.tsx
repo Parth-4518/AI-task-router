@@ -159,14 +159,14 @@ function touchCenter(a: React.Touch, b: React.Touch, container: HTMLDivElement):
 import { getAdapterLabel } from "../adapters/adapter-display-registry";
 
 const statusDotColor: Record<string, string> = {
-  running: "#22d3ee",
-  active: "#4ade80",
-  paused: "#facc15",
-  idle: "#facc15",
-  error: "#f87171",
-  terminated: "#a3a3a3",
+  running: "var(--status-info)",
+  active: "var(--status-success)",
+  paused: "var(--status-warning)",
+  idle: "var(--status-warning)",
+  error: "var(--status-error)",
+  terminated: "var(--muted-foreground)",
+  default: "var(--muted-foreground)",
 };
-const defaultDotColor = "#a3a3a3";
 
 // ── Main component ──────────────────────────────────────────────────────
 
@@ -559,7 +559,7 @@ export function OrgChart() {
         >
           {allNodes.map((node) => {
             const agent = agentMap.get(node.id);
-            const dotColor = statusDotColor[node.status] ?? defaultDotColor;
+            const dotColor = statusDotColor[node.status] ?? statusDotColor.default;
 
             return (
               <div

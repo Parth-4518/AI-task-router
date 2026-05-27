@@ -1124,6 +1124,13 @@ export {
   supportedSandboxProvidersForAdapter,
 } from "./environment-support.js";
 
+export {
+  chatRouteRequestSchema,
+  chatRouteResponseSchema,
+  type ChatRouteRequest,
+  type ChatRouteResponse,
+} from "./validators/index.js";
+
 export type {
   AdapterEnvironmentSupport,
   EnvironmentCapabilities,

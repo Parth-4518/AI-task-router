@@ -157,10 +157,10 @@ export function ProfileSettings() {
 
       <section className="space-y-8">
         <div className="relative overflow-hidden rounded-[28px] border border-border/70 bg-card shadow-sm">
-          <div className="absolute inset-x-0 top-0 h-32 bg-[linear-gradient(135deg,hsl(var(--primary))_0%,hsl(var(--accent))_58%,color-mix(in_oklab,hsl(var(--background))_76%,white_24%)_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.22),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.08),transparent_36%)]" />
+          <div className="absolute inset-x-0 top-0 h-32 bg-[linear-gradient(135deg,hsl(var(--primary))_0%,hsl(var(--accent))_58%,color-mix(in_oklab,hsl(var(--background))_76%,color-mix(in_oklab,var(--background)_80%,var(--foreground)_20%)_24%)_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--highlight-tint),transparent_34%),radial-gradient(circle_at_bottom_left,var(--highlight-tint),transparent_36%)]" />
           <div className="relative p-6 pt-10">
-            <div className="flex flex-wrap items-end gap-5 rounded-[24px] border border-border/70 bg-background/92 p-5 shadow-[0_18px_44px_-28px_rgba(0,0,0,0.45)] backdrop-blur-sm">
+            <div className="flex flex-wrap items-end gap-5 rounded-[24px] border border-border/70 bg-background/92 p-5 shadow-[0_18px_44px_-28px_var(--shadow-tint-heavy)] backdrop-blur-sm">
               <div className="space-y-3">
                 <label
                   htmlFor={avatarInputId}

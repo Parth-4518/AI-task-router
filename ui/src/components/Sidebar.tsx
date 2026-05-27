@@ -12,6 +12,8 @@ import {
   Repeat,
   GitBranch,
   Settings,
+  BarChart3,
+  Bot,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { NavLink } from "@/lib/router";
@@ -82,6 +84,13 @@ export function Sidebar() {
             <span className="truncate">New Issue</span>
           </button>
           <SidebarNavItem to="/dashboard" label="Dashboard" icon={LayoutDashboard} liveCount={liveRunCount} />
+          <a
+            href="/chat"
+            className="flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium transition-colors text-foreground/80 hover:bg-accent/50 hover:text-foreground"
+          >
+            <Bot className="h-4 w-4 shrink-0" />
+            <span className="truncate">AI Task Router</span>
+          </a>
           <SidebarNavItem
             to="/inbox"
             label="Inbox"
@@ -122,6 +131,7 @@ export function Sidebar() {
           <SidebarNavItem to="/org" label="Org" icon={Network} />
           <SidebarNavItem to="/skills" label="Skills" icon={Boxes} />
           <SidebarNavItem to="/costs" label="Costs" icon={DollarSign} />
+          <SidebarNavItem to="/analytics" label="Analytics" icon={BarChart3} />
           <SidebarNavItem to="/activity" label="Activity" icon={History} />
           <SidebarNavItem to="/company/settings" label="Settings" icon={Settings} />
         </SidebarSection>

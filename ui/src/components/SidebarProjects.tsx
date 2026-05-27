@@ -107,7 +107,7 @@ function ProjectItem({
       >
         <span
           className="shrink-0 h-3.5 w-3.5 rounded-sm"
-          style={{ backgroundColor: project.color ?? "#6366f1" }}
+          style={{ backgroundColor: project.color ?? "var(--default-project-primary)" }}
         />
         <span className="flex-1 truncate">{project.name}</span>
         {project.pauseReason === "budget" ? <BudgetSidebarMarker title="Project paused by budget" /> : null}

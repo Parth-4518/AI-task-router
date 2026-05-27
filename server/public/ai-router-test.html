@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Router API - Test & Output</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        .status-done {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-running {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .api-endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            margin: 15px 0;
+        }
+        
+        .code-block .key {
+            color: #66d9ef;
+        }
+        
+        .code-block .string {
+            color: #a6e22e;
+        }
+        
+        .code-block .number {
+            color: #ae81ff;
+        }
+        
+        .test-result {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .test-result h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .matched-agent {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .issue-details {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 3px solid #667eea;
+        }
+        
+        .info-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .info-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .info-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-card li:last-child {
+            border-bottom: none;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        
+        .btn:hover {
+            background: #5568d3;
+        }
+        
+        .file-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .file-list li {
+            padding: 10px;
+            background: #f8f9fa;
+            margin: 5px 0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .file-list li::before {
+            content: "📄";
+        }
+        
+        .priority-critical { color: #dc3545; font-weight: bold; }
+        .priority-high { color: #fd7e14; font-weight: bold; }
+        .priority-medium { color: #ffc107; font-weight: bold; }
+        .priority-low { color: #28a745; font-weight: bold; }
+        
+        .test-form {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .test-form input {
+            flex: 1;
+            min-width: 300px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+        
+        .test-form input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        #testOutput {
+            margin-top: 20px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 AI Router API</h1>
+        <p class="subtitle">Intelligent Task Routing System - Test & Output Viewer</p>
+        
+        <!-- Status Section -->
+        <div class="test-section">
+            <h2>
+                Task Status
+                <span class="status-badge status-done">✅ COMPLETED</span>
+            </h2>
+            <p><strong>Issue:</strong> TEC-16 - Create AI Router API</p>
+            <p><strong>Completed:</strong> May 21, 2026 at 09:35:37</p>
+            <p><strong>Agent:</strong> CEO Agent (hermes_local)</p>
+        </div>
+        
+        <!-- API Endpoint Section -->
+        <div class="test-section">
+            <h2>📡 API Endpoint</h2>
+            <div class="api-endpoint">
+                <strong>POST</strong> http://localhost:3100/api/chat/route
+            </div>
+            <div class="code-block">
+{
+    <span class="key">"prompt"</span>: <span class="string">"Your task description here"</span>,
+    <span class="key">"companyId"</span>: <span class="string">"a99fd059-c16b-4cdf-a4ca-0e78a04e42b8"</span>
+}
+            </div>
+        </div>
+        
+        <!-- Live Test Section -->
+        <div class="test-section">
+            <h2>🧪 Live Test</h2>
+            <p>Enter a prompt to test the AI Router API:</p>
+            <div class="test-form">
+                <input type="text" id="promptInput" placeholder="e.g., Fix a bug in the login system" value="Fix a bug in the login system">
+                <button class="btn" onclick="testAPI()">Test API</button>
+            </div>
+            <div id="testOutput"></div>
+        </div>
+        
+        <!-- Test Results Section -->
+        <div class="test-section">
+            <h2>📊 Predefined Test Results</h2>
+            
+            <div class="test-result">
+                <h3>Test 1: Bug Fix Request</h3>
+                <p><strong>Prompt:</strong> "Fix a bug in the login system"</p>
+                <div class="matched-agent">
+                    <strong>✅ Matched Agent:</strong> QA Engineer (qa)<br>
+                    <strong>Adapter:</strong> hermes_local
+                </div>
+                <div class="issue-details">
+                    <strong>Generated Issue:</strong><br>
+                    Title: Fix a bug in the login system<br>
+                    Priority: <span class="priority-medium">medium</span><br>
+                    Status: backlog
+                </div>
+            </div>
+            
+            <div class="test-result">
+                <h3>Test 2: Urgent Deployment</h3>
+                <p><strong>Prompt:</strong> "Deploy the new website to production urgently"</p>
+                <div class="matched-agent">
+                    <strong>✅ Matched Agent:</strong> DevOps Engineer (devops)<br>
+                    <strong>Adapter:</strong> hermes_local
+                </div>
+                <div class="issue-details">
+                    <strong>Generated Issue:</strong><br>
+                    Title: Deploy the new website to production urgently<br>
+                    Priority: <span class="priority-critical">CRITICAL</span> (detected "urgently")<br>
+                    Status: backlog
+                </div>
+            </div>
+            
+            <div class="test-result">
+                <h3>Test 3: Design Request</h3>
+                <p><strong>Prompt:</strong> "Design a new landing page for our product"</p>
+                <div class="matched-agent">
+                    <strong>✅ Matched Agent:</strong> Product Manager (pm)<br>
+                    <strong>Adapter:</strong> hermes_local
+                </div>
+                <div class="issue-details">
+                    <strong>Generated Issue:</strong><br>
+                    Title: Design a new landing page for our product<br>
+                    Priority: <span class="priority-medium">medium</span><br>
+                    Status: backlog
+                </div>
+            </div>
+            
+            <div class="test-result">
+                <h3>Test 4: Critical Security</h3>
+                <p><strong>Prompt:</strong> "Critical security vulnerability found in authentication"</p>
+                <div class="matched-agent">
+                    <strong>✅ Matched Agent:</strong> QA Engineer (qa)<br>
+                    <strong>Adapter:</strong> hermes_local
+                </div>
+                <div class="issue-details">
+                    <strong>Generated Issue:</strong><br>
+                    Title: Critical security vulnerability found in authentication<br>
+                    Priority: <span class="priority-critical">CRITICAL</span> (detected "Critical")<br>
+                    Status: backlog
+                </div>
+            </div>
+        </div>
+        
+        <!-- Files Section -->
+        <div class="test-section">
+            <h2>📁 Source Files</h2>
+            <ul class="file-list">
+                <li><strong>Main API:</strong> src/routes/chat-router.ts (199 lines)</li>
+                <li><strong>Types:</strong> packages/shared/src/validators/chat-router.ts (27 lines)</li>
+                <li><strong>Route Export:</strong> src/routes/index.ts (line 22)</li>
+                <li><strong>App Registration:</strong> src/app.ts (line 289)</li>
+            </ul>
+        </div>
+        
+        <!-- How It Works -->
+        <div class="test-section">
+            <h2>⚙️ How It Works</h2>
+            <div class="grid">
+                <div class="info-card">
+                    <h3>1. Keyword Matching</h3>
+                    <ul>
+                        <li>Role match: +10 points</li>
+                        <li>Title match: +8 points</li>
+                        <li>Name match: +6 points</li>
+                        <li>Capability match: +3 points</li>
+                        <li>Generic keyword: +4 points</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>2. Priority Detection</h3>
+                    <ul>
+                        <li class="priority-critical">Critical: urgent, critical, emergency, down, broken</li>
+                        <li class="priority-high">High: important, high priority, blocking</li>
+                        <li class="priority-medium">Medium: default</li>
+                        <li class="priority-low">Low: nice to have, low priority</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>3. Issue Generation</h3>
+                    <ul>
+                        <li>Auto-generates title</li>
+                        <li>Creates description</li>
+                        <li>Sets priority</li>
+                        <li>Sets status to backlog</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Code Preview -->
+        <div class="test-section">
+            <h2>💻 Code Preview</h2>
+            <div class="code-block">
+<span class="comment">// POST /api/chat/route</span>
+router.post(<span class="string">"/chat/route"</span>, validate(chatRouteRequestSchema), async (req, res) => {
+    const { prompt, companyId } = req.body;
+    
+    <span class="comment">// 1. Get active agents</span>
+    const agents = await agentSvc.list(companyId);
+    
+    <span class="comment">// 2. Score each agent based on keywords</span>
+    const scored = agents.map(agent => ({
+        agent,
+        score: calculateMatchScore(prompt, agent)
+    }));
+    
+    <span class="comment">// 3. Sort and pick best match</span>
+    scored.sort((a, b) => b.score - a.score);
+    const bestMatch = scored[0];
+    
+    <span class="comment">// 4. Generate issue details</span>
+    const issue = {
+        title: generateTitle(prompt),
+        description: generateDescription(prompt, bestMatch.agent),
+        priority: detectPriority(prompt),
+        status: "backlog"
+    };
+    
+    <span class="comment">// 5. Return result</span>
+    res.json({ matchedAgent: bestMatch.agent, issue });
+});
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function testAPI() {
+            const prompt = document.getElementById('promptInput').value;
+            const output = document.getElementById('testOutput');
+            
+            if (!prompt) {
+                output.innerHTML = '<div class="error">Please enter a prompt</div>';
+                return;
+            }
+            
+            output.innerHTML = '<div class="loading">Testing API... ⏳</div>';
+            
+            try {
+                const response = await fetch('http://localhost:3100/api/chat/route', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer local-dev-token'
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        companyId: 'a99fd059-c16b-4cdf-a4ca-0e78a04e42b8'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                output.innerHTML = `
+                    <div class="test-result">
+                        <h3>✅ Live Test Result</h3>
+                        <p><strong>Prompt:</strong> "${prompt}"</p>
+                        <div class="matched-agent">
+                            <strong>Matched Agent:</strong> ${data.matchedAgent.name} (${data.matchedAgent.role})<br>
+                            <strong>Adapter:</strong> ${data.matchedAgent.adapterType}
+                        </div>
+                        <div class="issue-details">
+                            <strong>Generated Issue:</strong><br>
+                            Title: ${data.issue.title}<br>
+                            Priority: <span class="priority-${data.issue.priority}">${data.issue.priority.toUpperCase()}</span><br>
+                            Status: ${data.issue.status}
+                        </div>
+                        <details>
+                            <summary>View Full JSON Response</summary>
+                            <div class="code-block">${JSON.stringify(data, null, 2)}</div>
+                        </details>
+                    </div>
+                `;
+            } catch (error) {
+                output.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Error:</strong> ${error.message}<br>
+                        <small>Make sure the Paperclip server is running on localhost:3100</small>
+                    </div>
+                `;
+            }
+        }
+        
+        // Allow Enter key to submit
+        document.getElementById('promptInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                testAPI();
+            }
+        });
+    </script>
+</body>
+</html>

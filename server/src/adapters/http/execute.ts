@@ -4,9 +4,13 @@ import { asString, asNumber, parseObject } from "../utils.js";
 export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExecutionResult> {
   const { config, runId, agent, context } = ctx;
   const url = asString(config.url, "");
+  console.log("================================");
+  console.log("HTTP Adapter URL:", url);
   if (!url) throw new Error("HTTP adapter missing url");
 
   const method = asString(config.method, "POST");
+  console.log("HTTP Adapter Method:", method);
+  console.log("================================");
   const timeoutMs = asNumber(config.timeoutMs, 0);
   const headers = parseObject(config.headers) as Record<string, string>;
   const payloadTemplate = parseObject(config.payloadTemplate);

@@ -89,9 +89,56 @@
   --chip-match-identifier-bg: var(--muted);
   --chip-match-identifier-fg: var(--muted-foreground);
   --chip-match-identifier-border: var(--border);
+  --default-project-primary: var(--primary);
+  --default-project-secondary: var(--muted-foreground);
+
+  /* Shadow / decorative tint colors — theme adaptive */
+  --shadow-tint: color-mix(in oklab, var(--foreground) 8%, transparent);
+  --shadow-tint-strong: color-mix(in oklab, var(--foreground) 12%, transparent);
+  --shadow-tint-heavy: color-mix(in oklab, var(--foreground) 28%, transparent);
+  --shadow-tint-subtle: color-mix(in oklab, var(--foreground) 2%, transparent);
+  --highlight-tint: color-mix(in oklab, var(--background) 10%, transparent);
+  --highlight-tint-subtle: color-mix(in oklab, var(--background) 2%, transparent);
+
+  /* Decorative accent tints for UX lab gradients — theme adaptive */
+  --accent-tint-cyan: color-mix(in oklab, var(--info) 18%, transparent);
+  --accent-tint-cyan-subtle: color-mix(in oklab, var(--info) 8%, transparent);
+  --accent-tint-amber: color-mix(in oklab, var(--warning) 18%, transparent);
+  --accent-tint-amber-subtle: color-mix(in oklab, var(--warning) 8%, transparent);
+  --accent-tint-purple: color-mix(in oklab, var(--chart-4) 18%, transparent);
+  --accent-tint-purple-subtle: color-mix(in oklab, var(--chart-4) 8%, transparent);
+  --accent-tint-emerald: color-mix(in oklab, var(--status-success) 18%, transparent);
+  --accent-tint-emerald-subtle: color-mix(in oklab, var(--status-success) 8%, transparent);
+  --accent-tint-rose: color-mix(in oklab, var(--destructive) 18%, transparent);
+  --accent-tint-rose-subtle: color-mix(in oklab, var(--destructive) 8%, transparent);
+  --accent-tint-blue: color-mix(in oklab, var(--chart-1) 18%, transparent);
+  --accent-tint-blue-subtle: color-mix(in oklab, var(--chart-1) 8%, transparent);
+  --accent-tint-yellow: color-mix(in oklab, var(--chart-5) 18%, transparent);
+  --accent-tint-yellow-subtle: color-mix(in oklab, var(--chart-5) 8%, transparent);
+  --accent-tint-pink: color-mix(in oklab, var(--chart-3) 18%, transparent);
+  --accent-tint-pink-subtle: color-mix(in oklab, var(--chart-3) 8%, transparent);
+
+  /* Semantic status colors */
+  --status-success: oklch(0.55 0.15 145);
+  --status-success-fg: oklch(0.98 0 0);
+  --status-success-bg: oklch(0.95 0.03 145);
+  --status-success-border: oklch(0.75 0.1 145);
+  --status-error: oklch(0.55 0.22 25);
+  --status-error-fg: oklch(0.98 0 0);
+  --status-error-bg: oklch(0.95 0.03 25);
+  --status-error-border: oklch(0.7 0.15 25);
+  --status-warning: oklch(0.7 0.15 85);
+  --status-warning-fg: oklch(0.25 0.05 85);
+  --status-warning-bg: oklch(0.97 0.03 85);
+  --status-warning-border: oklch(0.8 0.1 85);
+  --status-info: oklch(0.6 0.15 250);
+  --status-info-fg: oklch(0.98 0 0);
+  --status-info-bg: oklch(0.95 0.03 250);
+  --status-info-border: oklch(0.75 0.1 250);
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -136,6 +183,50 @@
   --chip-match-identifier-bg: var(--muted);
   --chip-match-identifier-fg: var(--muted-foreground);
   --chip-match-identifier-border: var(--border);
+
+  /* Shadow / decorative tint colors — dark mode */
+  --shadow-tint: color-mix(in oklab, var(--foreground) 10%, transparent);
+  --shadow-tint-strong: color-mix(in oklab, var(--foreground) 14%, transparent);
+  --shadow-tint-heavy: color-mix(in oklab, var(--foreground) 32%, transparent);
+  --shadow-tint-subtle: color-mix(in oklab, var(--foreground) 3%, transparent);
+  --highlight-tint: color-mix(in oklab, var(--background) 12%, transparent);
+  --highlight-tint-subtle: color-mix(in oklab, var(--background) 3%, transparent);
+
+  /* Decorative accent tints for UX lab gradients — dark mode */
+  --accent-tint-cyan: color-mix(in oklab, var(--info) 22%, transparent);
+  --accent-tint-cyan-subtle: color-mix(in oklab, var(--info) 10%, transparent);
+  --accent-tint-amber: color-mix(in oklab, var(--warning) 22%, transparent);
+  --accent-tint-amber-subtle: color-mix(in oklab, var(--warning) 10%, transparent);
+  --accent-tint-purple: color-mix(in oklab, var(--chart-4) 22%, transparent);
+  --accent-tint-purple-subtle: color-mix(in oklab, var(--chart-4) 10%, transparent);
+  --accent-tint-emerald: color-mix(in oklab, var(--status-success) 22%, transparent);
+  --accent-tint-emerald-subtle: color-mix(in oklab, var(--status-success) 10%, transparent);
+  --accent-tint-rose: color-mix(in oklab, var(--destructive) 22%, transparent);
+  --accent-tint-rose-subtle: color-mix(in oklab, var(--destructive) 10%, transparent);
+  --accent-tint-blue: color-mix(in oklab, var(--chart-1) 22%, transparent);
+  --accent-tint-blue-subtle: color-mix(in oklab, var(--chart-1) 10%, transparent);
+  --accent-tint-yellow: color-mix(in oklab, var(--chart-5) 22%, transparent);
+  --accent-tint-yellow-subtle: color-mix(in oklab, var(--chart-5) 10%, transparent);
+  --accent-tint-pink: color-mix(in oklab, var(--chart-3) 22%, transparent);
+  --accent-tint-pink-subtle: color-mix(in oklab, var(--chart-3) 10%, transparent);
+
+  /* Semantic status colors — dark mode */
+  --status-success: oklch(0.65 0.18 145);
+  --status-success-fg: oklch(0.95 0.05 145);
+  --status-success-bg: oklch(0.25 0.05 145);
+  --status-success-border: oklch(0.5 0.12 145);
+  --status-error: oklch(0.65 0.22 25);
+  --status-error-fg: oklch(0.95 0.05 25);
+  --status-error-bg: oklch(0.25 0.05 25);
+  --status-error-border: oklch(0.5 0.15 25);
+  --status-warning: oklch(0.75 0.16 85);
+  --status-warning-fg: oklch(0.95 0.05 85);
+  --status-warning-bg: oklch(0.25 0.05 85);
+  --status-warning-border: oklch(0.5 0.12 85);
+  --status-info: oklch(0.7 0.18 250);
+  --status-info-fg: oklch(0.95 0.05 250);
+  --status-info-bg: oklch(0.25 0.05 250);
+  --status-info-border: oklch(0.5 0.12 250);
 }
 
 @layer base {
@@ -464,14 +555,14 @@
 }
 
 .paperclip-mdxeditor-content a:not(.paperclip-mention-chip):not(.paperclip-project-mention-chip) {
-  color: color-mix(in oklab, var(--foreground) 76%, #0969da 24%);
+  color: color-mix(in oklab, var(--foreground) 76%, var(--link-blue) 24%);
   text-decoration: underline;
   text-underline-offset: 0.15em;
   cursor: pointer;
 }
 
 .dark .paperclip-mdxeditor-content a:not(.paperclip-mention-chip):not(.paperclip-project-mention-chip) {
-  color: color-mix(in oklab, var(--foreground) 80%, #58a6ff 20%);
+  color: color-mix(in oklab, var(--foreground) 80%, var(--link-blue-dark) 20%);
 }
 
 .paperclip-mdxeditor-content a.paperclip-mention-chip,
@@ -486,6 +577,10 @@
   font-size: 0.75rem;
   line-height: 1.25;
   text-decoration: none;
+  /* Center the pill on the surrounding x-height so it sits on the text line
+     instead of hanging below it. inline-flex baseline alignment is unreliable
+     across browsers, so use vertical-align: middle for a predictable result.
+     Nudge up 1px so it visually centers with the cap height of the text. */
   vertical-align: middle;
   position: relative;
   top: -1px;
@@ -600,48 +695,48 @@ a.paperclip-mention-chip[data-mention-kind="agent"]::before {
   padding: 0;
   border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent);
   border-radius: calc(var(--radius) - 3px);
-  background: #1e1e2e;
-  color: #cdd6f4;
+  background: var(--code-bg);
+  color: var(--code-fg);
   overflow-x: auto;
 }
 
 /* Dark theme for CodeMirror code blocks inside the MDXEditor.
    Overrides the default cm6-theme-basic-light that MDXEditor bundles. */
 .paperclip-mdxeditor .cm-editor {
-  background-color: #1e1e2e !important;
-  color: #cdd6f4 !important;
+  background-color: var(--code-bg) !important;
+  color: var(--code-fg) !important;
   font-size: 1em;
 }
 
 .paperclip-mdxeditor .cm-gutters {
-  background-color: #181825 !important;
-  color: #585b70 !important;
-  border-right: 1px solid #313244 !important;
+  background-color: var(--code-gutter-bg) !important;
+  color: var(--code-gutter-fg) !important;
+  border-right: 1px solid var(--code-border-color) !important;
 }
 
 .paperclip-mdxeditor .cm-activeLineGutter {
-  background-color: #1e1e2e !important;
+  background-color: var(--code-bg) !important;
 }
 
 .paperclip-mdxeditor .cm-activeLine {
-  background-color: color-mix(in oklab, #cdd6f4 5%, transparent) !important;
+  background-color: color-mix(in oklab, var(--code-fg) 5%, transparent) !important;
 }
 
 .paperclip-mdxeditor .cm-cursor,
 .paperclip-mdxeditor .cm-dropCursor {
-  border-left-color: #cdd6f4 !important;
+  border-left-color: var(--code-fg) !important;
 }
 
 .paperclip-mdxeditor .cm-selectionBackground {
-  background-color: color-mix(in oklab, #89b4fa 25%, transparent) !important;
+  background-color: color-mix(in oklab, var(--code-active-line) 25%, transparent) !important;
 }
 
 .paperclip-mdxeditor .cm-focused .cm-selectionBackground {
-  background-color: color-mix(in oklab, #89b4fa 30%, transparent) !important;
+  background-color: color-mix(in oklab, var(--code-active-line) 30%, transparent) !important;
 }
 
 .paperclip-mdxeditor .cm-content {
-  caret-color: #cdd6f4;
+  caret-color: var(--code-fg);
 }
 
 /* MDXEditor code block language selector – show on hover only */
@@ -661,9 +756,9 @@ a.paperclip-mention-chip[data-mention-kind="agent"]::before {
 
 .paperclip-mdxeditor-content [class*="_codeMirrorToolbar_"] select,
 .paperclip-mdxeditor-content [class*="_codeBlockToolbar_"] select {
-  background-color: #313244;
-  color: #cdd6f4;
-  border-color: #45475a;
+  background-color: var(--code-toolbar-bg);
+  color: var(--code-fg);
+  border-color: var(--code-toolbar-border);
 }
 
 .paperclip-mdxeditor-content [class*="_codeMirrorWrapper_"]:hover [class*="_codeMirrorToolbar_"],
@@ -677,17 +772,17 @@ a.paperclip-mention-chip[data-mention-kind="agent"]::before {
    Dark theme code blocks with compact sizing.
    Override prose CSS variables so prose-invert can't revert to defaults. */
 .paperclip-markdown {
-  --tw-prose-pre-bg: #1e1e2e;
-  --tw-prose-pre-code: #cdd6f4;
-  --tw-prose-invert-pre-bg: #1e1e2e;
-  --tw-prose-invert-pre-code: #cdd6f4;
+  --tw-prose-pre-bg: var(--code-bg);
+  --tw-prose-pre-code: var(--code-fg);
+  --tw-prose-invert-pre-bg: var(--code-bg);
+  --tw-prose-invert-pre-code: var(--code-fg);
 }
 
 .paperclip-markdown pre {
   border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent) !important;
   border-radius: calc(var(--radius) - 3px) !important;
-  background-color: #1e1e2e !important;
-  color: #cdd6f4 !important;
+  background-color: var(--code-bg) !important;
+  color: var(--code-fg) !important;
   padding: 0.5rem 0.65rem !important;
   margin: 0.4rem 0 !important;
   font-size: 1em !important;
@@ -768,7 +863,7 @@ a.paperclip-mention-chip[data-mention-kind="agent"]::before {
 }
 
 .dark .prose :not(pre) > code {
-  background-color: #ffffff0f;
+  background-color: var(--inline-code-bg-dark);
 }
 
 .paperclip-markdown {
@@ -850,7 +945,7 @@ a.paperclip-mention-chip[data-mention-kind="agent"]::before {
 }
 
 .paperclip-markdown a {
-  color: color-mix(in oklab, var(--foreground) 76%, #0969da 24%);
+  color: color-mix(in oklab, var(--foreground) 76%, var(--link-blue) 24%);
   text-decoration: underline;
   text-underline-offset: 0.15em;
   cursor: pointer;
@@ -873,7 +968,7 @@ a.paperclip-mention-chip[data-mention-kind="agent"]::before {
 }
 
 .dark .paperclip-markdown a {
-  color: color-mix(in oklab, var(--foreground) 80%, #58a6ff 20%);
+  color: color-mix(in oklab, var(--foreground) 80%, var(--link-blue-dark) 20%);
 }
 
 .paperclip-markdown blockquote {
@@ -979,6 +1074,7 @@ span.paperclip-project-mention-chip {
   position: relative;
   top: -1px;
   white-space: nowrap;
+  user-select: none;
 }
 
 /* When the identifier inside a chip is backtick-wrapped in markdown, strip the

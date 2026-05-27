@@ -1407,7 +1407,7 @@ export function NewIssueDialog() {
                     <>
                       <span
                         className="h-3.5 w-3.5 shrink-0 rounded-sm"
-                        style={{ backgroundColor: currentProject.color ?? "#6366f1" }}
+                        style={{ backgroundColor: currentProject.color ?? "var(--default-project-primary)" }}
                       />
                       <span className="truncate">{option.label}</span>
                     </>
@@ -1422,7 +1422,7 @@ export function NewIssueDialog() {
                     <>
                       <span
                         className="h-3.5 w-3.5 shrink-0 rounded-sm"
-                        style={{ backgroundColor: project?.color ?? "#6366f1" }}
+                        style={{ backgroundColor: project?.color ?? "var(--default-project-primary)" }}
                       />
                       <span className="truncate">{option.label}</span>
                     </>

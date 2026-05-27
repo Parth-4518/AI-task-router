@@ -1,0 +1,29 @@
+{
+  "name": "tec-7-standup-os",
+  "version": "1.0.0",
+  "description": "AI Standup + Productivity OS",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "standup": "node dist/cli/commands.js standup",
+    "summary": "node dist/cli/commands.js summary",
+    "sync": "node dist/cli/commands.js sync",
+    "dev": "ts-node src/cli/commands.ts"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15",
+    "better-sqlite3": "^9.4.3",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.5",
+    "inquirer": "^9.2.15",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.9",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.11.0",
+    "@types/node-cron": "^3.0.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

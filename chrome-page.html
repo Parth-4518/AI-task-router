@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome - Fast, Secure Browser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            color: #3c4043;
+            line-height: 1.6;
+        }
+
+        /* Chrome Header Bar */
+        .chrome-bar {
+            background: #dee1e6;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #c6cacf;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        .window-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .window-btn.close { background: #ff5f57; }
+        .window-btn.minimize { background: #ffbd2e; }
+        .window-btn.maximize { background: #28c840; }
+
+        .tab-bar {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            gap: 4px;
+        }
+
+        .tab {
+            background: #ffffff;
+            padding: 8px 16px;
+            border-radius: 8px 8px 0 0;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 200px;
+        }
+
+        .tab-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .address-bar {
+            background: #ffffff;
+            padding: 6px 16px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            font-size: 13px;
+            color: #5f6368;
+        }
+
+        .address-bar .secure {
+            color: #137333;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 50%, #fbbc04 75%, #ea4335 100%);
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.3;
+        }
+
+        .chrome-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chrome-logo svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 4px 20px rgba(0,0,0,0.2));
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .download-btn {
+            margin-top: 2rem;
+            padding: 14px 32px;
+            background: white;
+            color: #4285f4;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 3rem;
+            color: #202124;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            border-radius: 12px;
+            background: #f8f9fa;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #202124;
+        }
+
+        .feature-card p {
+            color: #5f6368;
+            font-size: 0.95rem;
+        }
+
+        .speed { background: #e8f0fe; }
+        .security { background: #e6f4ea; }
+        .privacy { background: #fce8e6; }
+        .sync { background: #fef7e0; }
+
+        /* Footer */
+        .footer {
+            background: #f8f9fa;
+            padding: 2rem;
+            text-align: center;
+            color: #5f6368;
+            font-size: 0.9rem;
+            border-top: 1px solid #dadce0;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feature-card {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <!-- Chrome Browser Bar -->
+    <div class="chrome-bar">
+        <div class="window-controls">
+            <div class="window-btn close"></div>
+            <div class="window-btn minimize"></div>
+            <div class="window-btn maximize"></div>
+        </div>
+        <div class="tab-bar">
+            <div class="tab">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="#ea4335">
+                    <circle cx="12" cy="12" r="10" fill="none" stroke="#ea4335" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="4" fill="#ea4335"/>
+                    <path d="M12 8V2M12 22v-6M8 12H2m20 0h-6" stroke="#fbbc04" stroke-width="2"/>
+                </svg>
+                <span>Chrome - Fast, Secure Browser</span>
+            </div>
+        </div>
+        <div class="address-bar">
+            <span class="secure">&#128274;</span>
+            <span>chrome.google.com</span>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="chrome-logo">
+            <svg viewBox="0 0 120 120">
+                <!-- Outer ring -->
+                <circle cx="60" cy="60" r="55" fill="#ea4335"/>
+                <circle cx="60" cy="60" r="55" fill="none" stroke="#ea4335" stroke-width="0"/>
+                
+                <!-- Green section -->
+                <path d="M60 60 L60 5 A55 55 0 0 1 110 35 Z" fill="#34a853"/>
+                
+                <!-- Yellow section -->
+                <path d="M60 60 L110 35 A55 55 0 0 1 105 90 Z" fill="#fbbc04"/>
+                
+                <!-- Red section -->
+                <path d="M60 60 L105 90 A55 55 0 0 1 15 90 Z" fill="#ea4335"/>
+                
+                <!-- Green section 2 -->
+                <path d="M60 60 L15 90 A55 55 0 0 1 60 5 Z" fill="#34a853"/>
+                
+                <!-- Inner white circle -->
+                <circle cx="60" cy="60" r="22" fill="white"/>
+                
+                <!-- Center blue circle -->
+                <circle cx="60" cy="60" r="18" fill="#4285f4"/>
+            </svg>
+        </div>
+        <h1>The Browser Built for You</h1>
+        <p>Fast, secure, and easy to use. Chrome helps you get things done and stay safe online.</p>
+        <button class="download-btn">Download Chrome</button>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2>Why Chrome?</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon speed">&#128640;</div>
+                <h3>Lightning Fast</h3>
+                <p>Load pages instantly with Chrome's powerful V8 engine and advanced caching.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon security">&#128274;</div>
+                <h3>Built-in Security</h3>
+                <p>Safe Browsing protects you from dangerous sites and downloads automatically.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon privacy">&#128373;</div>
+                <h3>Privacy Controls</h3>
+                <p>Incognito mode and privacy settings keep your browsing history to yourself.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon sync">&#128260;</div>
+                <h3>Sync Everywhere</h3>
+                <p>Bookmarks, passwords, and history sync across all your devices seamlessly.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p> Chrome Browser Demo. Created for Paperclip AI. All rights reserved.</p>
+        <p>Google Chrome is a trademark of Google LLC. This is a fan-made demo page.</p>
+    </footer>
+</body>
+</html>

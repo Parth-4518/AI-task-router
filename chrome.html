@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 33%, #fbbc04 66%, #ea4335 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .chrome-logo {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 40px;
+            animation: spin 20s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        h1 {
+            font-size: 4rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .search-box {
+            width: 600px;
+            max-width: 90%;
+            padding: 15px 25px;
+            border-radius: 30px;
+            border: none;
+            font-size: 1.2rem;
+            outline: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        .shortcuts {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .shortcut {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            backdrop-filter: blur(10px);
+        }
+        .shortcut:hover {
+            transform: scale(1.1);
+            background: rgba(255,255,255,0.3);
+        }
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <svg class="chrome-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" fill="#4285f4"/>
+        <circle cx="50" cy="50" r="20" fill="white"/>
+        <circle cx="50" cy="50" r="15" fill="#4285f4"/>
+        <path d="M50 5 L85 75 L15 75 Z" fill="#ea4335" opacity="0.9"/>
+        <path d="M85 75 L50 5 L95 50 Z" fill="#fbbc04" opacity="0.9"/>
+        <path d="M15 75 L50 5 L5 50 Z" fill="#34a853" opacity="0.9"/>
+    </svg>
+    
+    <h1>Chrome</h1>
+    
+    <input type="text" class="search-box" placeholder="Search the web or type a URL">
+    
+    <div class="shortcuts">
+        <div class="shortcut">G</div>
+        <div class="shortcut">Y</div>
+        <div class="shortcut">M</div>
+        <div class="shortcut">D</div>
+    </div>
+    
+    <div class="footer">Created by CEO agent for TEC-68</div>
+</body>
+</html>

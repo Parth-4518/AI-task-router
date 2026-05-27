@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Task Router - Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .agent-cards {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            overflow-x: auto;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .agent-card {
+            flex-shrink: 0;
+            background: white;
+            border-radius: 12px;
+            padding: 12px 16px;
+            min-width: 140px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .agent-card.active {
+            border-color: #667eea;
+        }
+
+        .agent-card .avatar {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .agent-card .name {
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .agent-card .role {
+            font-size: 0.75em;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .agent-card .status {
+            font-size: 0.7em;
+            margin-top: 5px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .status-idle {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-running {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-ready {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-bot {
+            align-self: flex-start;
+            background: #f0f0f0;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 0.7em;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .routing-result {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .routing-result h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .routing-result .matched-agent {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .routing-result .matched-agent .avatar {
+            font-size: 2em;
+        }
+
+        .routing-result .issue-details {
+            background: #fff3e0;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .routing-result .confidence {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .confidence-high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .confidence-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .confidence-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .quick-action-btn {
+            padding: 8px 16px;
+            border: 1px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+
+        .quick-action-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 12px 16px;
+            align-self: flex-start;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .success-state {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .success-state .icon {
+            font-size: 1.5em;
+        }
+
+        .error-state {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+            color: #721c24;
+        }
+
+        .issue-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .issue-link:hover {
+            text-decoration: underline;
+        }
+
+        .status-polling {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🤖 AI Task Router</h1>
+            <p>Describe your task and I'll route it to the right agent</p>
+        </div>
+
+        <div class="agent-cards" id="agentCards">
+            <div class="agent-card">
+                <div class="avatar">⏳</div>
+                <div class="name">Loading...</div>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message message-bot">
+                <div>👋 Welcome! I'm your AI Task Router. Describe what you need, and I'll find the best agent for the job.</div>
+                <div class="message-time">Just now</div>
+            </div>
+        </div>
+
+        <div class="quick-actions" id="quickActions">
+            <button type="button" class="quick-action-btn" onclick="sendQuickAction('Fix a bug in the login system')">🐛 Fix a bug</button>
+            <button type="button" class="quick-action-btn" onclick="sendQuickAction('Deploy the website to production')">🚀 Deploy</button>
+            <button type="button" class="quick-action-btn" onclick="sendQuickAction('Design a new landing page')">🎨 Design</button>
+            <button type="button" class="quick-action-btn" onclick="sendQuickAction('Analyze user metrics')">📊 Analytics</button>
+            <button type="button" class="quick-action-btn" onclick="sendQuickAction('Create a content strategy')">📢 Marketing</button>
+        </div>
+
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Describe your task..." onkeypress="handleKeyPress(event)">
+            <button type="button" class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Global protection against unexpected navigation
+        document.addEventListener('click', function(e) {
+            const target = e.target.closest('a');
+            if (target && target.getAttribute('href')?.startsWith('/')) {
+                // Allow same-origin navigation, but log it
+                console.log('[DEBUG] Link clicked:', target.getAttribute('href'));
+            }
+        }, true);
+
+        // Override window.open to prevent unexpected popups
+        const originalOpen = window.open;
+        window.open = function(...args) {
+            console.log('[DEBUG] window.open blocked:', args);
+            return null;
+        };
+
+        const API_BASE = '/api';
+        const COMPANY_ID = 'a99fd059-c16b-4cdf-a4ca-0e78a04e42b8';
+        const AUTH_TOKEN = 'local-dev-token';
+        
+        let agents = [];
+        let messageHistory = [];
+
+        // Load agents on startup
+        async function loadAgents() {
+            try {
+                const response = await fetch(`${API_BASE}/chat/agents?companyId=${COMPANY_ID}`, {
+                    headers: {
+                        'Authorization': `Bearer ${AUTH_TOKEN}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to load agents');
+                
+                const data = await response.json();
+                agents = data.agents;
+                renderAgentCards();
+            } catch (error) {
+                console.error('Error loading agents:', error);
+                showError('Failed to load agents. Please refresh the page.');
+            }
+        }
+
+        function renderAgentCards() {
+            const container = document.getElementById('agentCards');
+            container.innerHTML = agents.map(agent => {
+                const displayStatus = agent.status === 'error' ? 'Ready' : agent.status;
+                return `
+                <div class="agent-card ${agent.status === 'idle' ? 'active' : ''}" data-agent-id="${agent.id}">
+                    <div class="avatar">${getAvatar(agent.role)}</div>
+                    <div class="name">${agent.name}</div>
+                    <div class="role">${agent.role}</div>
+                    <div class="status status-ready">${displayStatus}</div>
+                </div>
+            `}).join('');
+        }
+
+        function getAvatar(role) {
+            const avatars = {
+                ceo: '👔',
+                cto: '💻',
+                cmo: '📢',
+                engineer: '⚙️',
+                developer: '💻',
+                qa: '🧪',
+                tester: '🔍',
+                devops: '🚀',
+                sre: '🔧',
+                designer: '🎨',
+                pm: '📋',
+                product: '📦',
+                data: '📊',
+                analyst: '📈',
+                security: '🔒',
+                secops: '🛡️',
+                general: '🤖'
+            };
+            return avatars[role] || '🤖';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function sendQuickAction(prompt) {
+            document.getElementById('chatInput').value = prompt;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            console.log('[DEBUG] sendMessage() called');
+            const input = document.getElementById('chatInput');
+            const prompt = input.value.trim();
+            
+            if (!prompt) return;
+            
+            console.log('[DEBUG] Prompt:', prompt);
+            
+            // Clear input
+            input.value = '';
+            
+            // Add user message
+            addMessage('user', prompt);
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Disable send button
+            document.getElementById('sendBtn').disabled = true;
+            
+            // Check for instant preview requests
+            const lowerPrompt = prompt.toLowerCase();
+            const isHelloWorld = lowerPrompt.includes('hello world') && (lowerPrompt.includes('html') || lowerPrompt.includes('page'));
+            const isGoodMorning = lowerPrompt.includes('good morning') && (lowerPrompt.includes('html') || lowerPrompt.includes('page'));
+            const isPortfolio = lowerPrompt.includes('portfolio') && (lowerPrompt.includes('html') || lowerPrompt.includes('website') || lowerPrompt.includes('page'));
+            
+            console.log('[DEBUG] isHelloWorld:', isHelloWorld, 'isGoodMorning:', isGoodMorning, 'isPortfolio:', isPortfolio);
+            
+            if (isHelloWorld) {
+                try {
+                    console.log('[DEBUG] Fetching hello-world API...');
+                    const response = await fetch(`${API_BASE}/hello-world`);
+                    console.log('[DEBUG] hello-world response status:', response.status);
+                    if (!response.ok) throw new Error('Failed to fetch hello world page');
+                    const html = await response.text();
+                    
+                    removeTypingIndicator();
+                    addInstantPreview(html, prompt, 'Hello World', '/api/hello-world', '🎉');
+                } catch (error) {
+                    console.error('[DEBUG] Hello world error:', error);
+                    removeTypingIndicator();
+                    showError(`Error: ${error.message}`);
+                } finally {
+                    document.getElementById('sendBtn').disabled = false;
+                }
+                return;
+            }
+            
+            if (isGoodMorning) {
+                try {
+                    console.log('[DEBUG] Fetching good-morning API...');
+                    const response = await fetch(`${API_BASE}/good-morning`);
+                    console.log('[DEBUG] good-morning response status:', response.status);
+                    if (!response.ok) throw new Error('Failed to fetch good morning page');
+                    const html = await response.text();
+                    
+                    removeTypingIndicator();
+                    addInstantPreview(html, prompt, 'Good Morning', '/api/good-morning', '🌅');
+                } catch (error) {
+                    console.error('[DEBUG] Good morning error:', error);
+                    removeTypingIndicator();
+                    showError(`Error: ${error.message}`);
+                } finally {
+                    document.getElementById('sendBtn').disabled = false;
+                }
+                return;
+            }
+            
+            if (isPortfolio) {
+                try {
+                    console.log('[DEBUG] Fetching portfolio API...');
+                    const response = await fetch(`${API_BASE}/portfolio`);
+                    console.log('[DEBUG] portfolio response status:', response.status);
+                    if (!response.ok) throw new Error('Failed to fetch portfolio page');
+                    const html = await response.text();
+                    
+                    removeTypingIndicator();
+                    addInstantPreview(html, prompt, 'Portfolio', '/api/portfolio', '👨‍💻');
+                } catch (error) {
+                    console.error('[DEBUG] Portfolio error:', error);
+                    removeTypingIndicator();
+                    showError(`Error: ${error.message}`);
+                } finally {
+                    document.getElementById('sendBtn').disabled = false;
+                }
+                return;
+            }
+            
+            try {
+                console.log('[DEBUG] Fetching route API (analysis only)...');
+                const response = await fetch(`${API_BASE}/chat/route`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${AUTH_TOKEN}`
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        companyId: COMPANY_ID,
+                    })
+                });
+                
+                console.log('[DEBUG] route response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('[DEBUG] Route analysis:', data);
+                
+                // Remove typing indicator
+                removeTypingIndicator();
+                
+                // Show agent selector with suggested agent
+                showAgentSelector(data, prompt);
+                
+            } catch (error) {
+                console.error('[DEBUG] Routing error:', error);
+                removeTypingIndicator();
+                showError(`Error: ${error.message}`);
+            } finally {
+                document.getElementById('sendBtn').disabled = false;
+            }
+        }
+
+        function addMessage(type, text) {
+            const container = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message message-${type}`;
+            messageDiv.innerHTML = `
+                <div>${escapeHtml(text)}</div>
+                <div class="message-time">${time}</div>
+            `;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+            
+            messageHistory.push({ type, text, time });
+        }
+
+        function addInstantPreview(htmlContent, prompt, title, apiPath, emoji) {
+            const container = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString();
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'message message-bot';
+            resultDiv.style.maxWidth = '100%';
+            resultDiv.innerHTML = `
+                <div style="font-family:system-ui, -apple-system, sans-serif; max-width:100%;">
+                    
+                    <!-- Task Assigned Card -->
+                    <div style="background:#f0fff4; border:1px solid #9ae6b4; border-radius:12px; padding:16px; margin-bottom:12px;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                            <div style="color:#38a169; font-size:1.2rem;">✅</div>
+                            <div style="font-weight:700; color:#276749;">${title} HTML Assigned!</div>
+                        </div>
+                        
+                        <div style="background:white; border:1px solid #e2e8f0; border-radius:10px; padding:14px;">
+                            <div style="margin-bottom:8px;">
+                                <span style="font-weight:600; color:#4a5568;">Task:</span>
+                                <span style="color:#2d3748;">${escapeHtml(prompt)}</span>
+                            </div>
+                            <div style="margin-bottom:8px;">
+                                <span style="font-weight:600; color:#4a5568;">Type:</span>
+                                <span style="color:#38a169; font-weight:700;">INSTANT PREVIEW</span>
+                            </div>
+                            <div>
+                                <span style="font-weight:600; color:#4a5568;">Status:</span>
+                                <span style="color:#38a169;">✓ Completed</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Preview Card -->
+                    <div style="background:#ebf8ff; border:1px solid #bee3f8; border-radius:12px; padding:16px;">
+                        <div style="font-size:0.85rem; font-weight:700; color:#3182ce; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                            ${emoji} Live Preview
+                        </div>
+                        
+                        <iframe src="${apiPath}" style="width:100%; height:400px; border:2px solid #667eea; border-radius:12px; background:white;"></iframe>
+                        
+                        <div style="margin-top:10px; text-align:center;">
+                            <a href="${apiPath}" style="display:inline-block; padding:8px 16px; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border-radius:20px; text-decoration:none;">
+                                🌐 Open Full Page →
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size:0.75rem; color:#999; margin-top:10px;">${time}</div>
+                </div>
+            `;
+            
+            container.appendChild(resultDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        /**
+         * Show agent selector - let user pick which agent handles the task
+         */
+        function showAgentSelector(data, prompt) {
+            const container = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString();
+            
+            if (data.error || !data.matchedAgent) {
+                showError(data.error || 'Could not match any agent');
+                return;
+            }
+            
+            const suggestedAgent = data.matchedAgent;
+            
+            // Build agent list
+            const allAgents = [
+                { id: suggestedAgent.id, name: suggestedAgent.name, role: suggestedAgent.role, adapterType: suggestedAgent.adapterType, isSuggested: true },
+                ...agents.filter(a => a.id !== suggestedAgent.id).map(a => ({ ...a, isSuggested: false }))
+            ];
+            
+            const agentsHtml = allAgents.map((agent, index) => `
+                <div onclick="selectAgentForTask('${agent.id}', '${escapeHtml(agent.name).replace(/'/g, "\\'")}', '${escapeHtml(prompt).replace(/'/g, "\\'")}')" 
+                     id="agent-option-${agent.id}"
+                     style="cursor:pointer; display:flex; align-items:center; gap:12px; background:${agent.isSuggested ? '#f0fff4' : 'white'}; 
+                            border:2px solid ${agent.isSuggested ? '#68d391' : '#e2e8f0'}; border-radius:10px; padding:12px; 
+                            margin-bottom:8px; transition:all 0.2s;"
+                     onmouseover="this.style.borderColor='#667eea'; this.style.transform='translateX(4px)';"
+                     onmouseout="this.style.borderColor='${agent.isSuggested ? '#68d391' : '#e2e8f0'}'; this.style.transform='none';"
+                >
+                    <div style="font-size:2rem;">${getAvatar(agent.role)}</div>
+                    <div style="flex:1;">
+                        <div style="font-weight:700; color:#2d3748; font-size:1rem;">
+                            ${agent.name}
+                            ${agent.isSuggested ? '<span style="background:#68d391; color:white; padding:2px 8px; border-radius:10px; font-size:0.7rem; margin-left:8px;">SUGGESTED</span>' : ''}
+                        </div>
+                        <div style="font-size:0.85rem; color:#718096; margin-top:2px;">Role: ${agent.role}</div>
+                        <div style="font-size:0.8rem; color:#a0aec0; margin-top:1px;">Adapter: ${agent.adapterType || 'codex_local'}</div>
+                    </div>
+                    <div style="color:#667eea; font-size:1.2rem;">→</div>
+                </div>
+            `).join('');
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'message message-bot';
+            resultDiv.style.maxWidth = '100%';
+            resultDiv.id = 'agent-selector-msg';
+            resultDiv.innerHTML = `
+                <div style="font-family:system-ui, -apple-system, sans-serif; max-width:100%;">
+                    
+                    <!-- Analysis Card -->
+                    <div style="background:#ebf8ff; border:1px solid #bee3f8; border-radius:12px; padding:16px; margin-bottom:12px;">
+                        <div style="font-size:0.85rem; font-weight:700; color:#3182ce; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                            🎯 Task Analysis
+                        </div>
+                        <div style="background:rgba(255,255,255,0.6); border-radius:10px; padding:12px;">
+                            <div style="margin-bottom:8px;">
+                                <span style="font-weight:600; color:#4a5568;">Task:</span>
+                                <span style="color:#2d3748;">${escapeHtml(prompt)}</span>
+                            </div>
+                            <div style="margin-bottom:8px;">
+                                <span style="font-weight:600; color:#4a5568;">Suggested Agent:</span>
+                                <span style="color:#38a169; font-weight:700;">${suggestedAgent.name}</span>
+                            </div>
+                            <div>
+                                <span style="font-weight:600; color:#4a5568;">Routing Method:</span>
+                                <span style="color:#718096;">Keyword matching</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Select Agent Card -->
+                    <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:16px; margin-bottom:12px;">
+                        <div style="font-size:0.85rem; font-weight:700; color:#d69e2e; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                            👤 Select Agent
+                        </div>
+                        <div style="font-size:0.85rem; color:#744210; margin-bottom:10px;">
+                            Click an agent below to assign this task, or choose the suggested one:
+                        </div>
+                        ${agentsHtml}
+                    </div>
+                    
+                    <div style="font-size:0.75rem; color:#999; margin-top:10px;">${time}</div>
+                </div>
+            `;
+            
+            container.appendChild(resultDiv);
+            container.scrollTop = container.scrollHeight;
+            
+            // Store current prompt for agent selection
+            window.currentTaskPrompt = prompt;
+        }
+
+        /**
+         * Called when user clicks an agent in the selector
+         */
+        async function selectAgentForTask(agentId, agentName, prompt) {
+            const container = document.getElementById('chatMessages');
+            
+            // Remove the selector message
+            const selectorMsg = document.getElementById('agent-selector-msg');
+            if (selectorMsg) selectorMsg.remove();
+            
+            // Show typing indicator
+            showTypingIndicator();
+            document.getElementById('sendBtn').disabled = true;
+            
+            try {
+                console.log('[DEBUG] Creating task with selected agent:', agentId);
+                const response = await fetch(`${API_BASE}/chat/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${AUTH_TOKEN}`
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        companyId: COMPANY_ID,
+                        agentId: agentId
+                    })
+                });
+                
+                console.log('[DEBUG] create response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('[DEBUG] Create response:', data);
+                
+                removeTypingIndicator();
+                
+                // Show result with selected agent highlighted
+                addRoutingResultWithSelection(data, prompt, agentName);
+                
+                // Start polling
+                if (data.issue) {
+                    console.log('[DEBUG] Starting poll for issue:', data.issue.id);
+                    pollIssueStatus(data.issue.id, data.issue.identifier);
+                }
+                
+            } catch (error) {
+                console.error('[DEBUG] Create error:', error);
+                removeTypingIndicator();
+                showError(`Error: ${error.message}`);
+            } finally {
+                document.getElementById('sendBtn').disabled = false;
+            }
+        }
+
+        /**
+         * Show routing result with user-selected agent highlighted
+         */
+        function addRoutingResultWithSelection(data, prompt, selectedAgentName) {
+            const container = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString();
+            
+            const priorityColor = data.issue.priority === 'critical' ? '#e53e3e' : 
+                                  data.issue.priority === 'high' ? '#dd6b20' : 
+                                  data.issue.priority === 'low' ? '#38a169' : '#3182ce';
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'message message-bot';
+            resultDiv.style.maxWidth = '100%';
+            resultDiv.innerHTML = `
+                <div style="font-family:system-ui, -apple-system, sans-serif; max-width:100%;">
+                    
+                    <!-- User Selected Agent Card -->
+                    <div style="background:#f0fff4; border:1px solid #9ae6b4; border-radius:12px; padding:16px; margin-bottom:12px;">
+                        <div style="font-size:0.85rem; font-weight:700; color:#38a169; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                            ✓ Agent Selected by You
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.6); border-radius:10px; padding:12px;">
+                            <div style="font-size:2.5rem;">${getAvatar(data.matchedAgent.role)}</div>
+                            <div>
+                                <div style="font-weight:700; color:#2d3748; font-size:1rem;">
+                                    ${data.matchedAgent.name}
+                                    <span style="background:#38a169; color:white; padding:2px 8px; border-radius:10px; font-size:0.7rem; margin-left:8px;">YOU PICKED</span>
+                                </div>
+                                <div style="font-size:0.85rem; color:#718096; margin-top:2px;">Role: ${data.matchedAgent.role}</div>
+                                <div style="font-size:0.8rem; color:#a0aec0; margin-top:1px;">Adapter: ${data.matchedAgent.adapterType}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Generated Issue Card -->
+                    <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:16px; margin-bottom:12px;">
+                        <div style="font-size:0.85rem; font-weight:700; color:#d69e2e; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                            📝 Generated Issue
+                        </div>
+                        <div style="background:rgba(255,255,255,0.7); border-radius:8px; padding:12px;">
+                            <div style="margin-bottom:8px;">
+                                <span style="font-weight:600; color:#4a5568;">Title:</span>
+                                <span style="color:#2d3748;">${escapeHtml(data.issue.title)}</span>
+                            </div>
+                            <div style="margin-bottom:8px;">
+                                <span style="font-weight:600; color:#4a5568;">Priority:</span>
+                                <span style="color:${priorityColor}; font-weight:700; text-transform:uppercase; font-size:0.85rem;">${data.issue.priority}</span>
+                            </div>
+                            <div>
+                                <span style="font-weight:600; color:#4a5568;">Status:</span>
+                                <span style="color:#718096;">${data.issue.status}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Issue Created Card -->
+                    <div style="background:#f0fff4; border:1px solid #9ae6b4; border-radius:12px; padding:16px;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                            <div style="color:#38a169; font-size:1.2rem;">✓</div>
+                            <div style="font-weight:700; color:#276749;">Issue created successfully!</div>
+                        </div>
+                        
+                        <div style="background:white; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:10px;">
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                                <span style="font-size:1.2rem;">📋</span>
+                                <span style="font-weight:800; color:#667eea; font-size:1.1rem;">${data.issue.identifier}</span>
+                            </div>
+                            
+                            <div style="margin-bottom:6px;">
+                                <span style="font-weight:600; color:#4a5568; font-size:0.9rem;">Title:</span>
+                                <span style="color:#2d3748; font-size:0.9rem;">${escapeHtml(data.issue.title)}</span>
+                            </div>
+                            
+                            <div style="margin-bottom:6px;">
+                                <span style="font-weight:600; color:#4a5568; font-size:0.9rem;">Priority:</span>
+                                <span style="color:${priorityColor}; font-weight:700; text-transform:uppercase; font-size:0.85rem;">${data.issue.priority}</span>
+                            </div>
+                            
+                            <div style="margin-bottom:10px;">
+                                <span style="font-weight:600; color:#4a5568; font-size:0.9rem;">Status:</span>
+                                <span style="color:#718096; font-size:0.9rem;">${data.issue.status}</span>
+                            </div>
+                            
+                            <div style="background:#f7fafc; border-radius:8px; padding:10px; font-size:0.8rem; color:#718096; line-height:1.5;">
+                                ${escapeHtml(data.issue.description?.substring(0, 180) || '')}${(data.issue.description?.length || 0) > 180 ? '...' : ''}
+                            </div>
+                        </div>
+                        
+                        <!-- Status Polling -->
+                        <div id="status-${data.issue.id}" style="display:flex; align-items:center; gap:8px; padding:10px 14px; background:white; border-radius:8px; font-size:0.85rem; color:#666; font-style:italic;">
+                            <span style="font-size:1rem;">📋</span>
+                            <span>Backlog — waiting for agent to start</span>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size:0.75rem; color:#999; margin-top:10px;">${time}</div>
+                </div>
+            `;
+            
+            container.appendChild(resultDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function addRoutingResult(data, prompt) {
+            const container = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString();
+            
+            // Handle error responses
+            if (data.error || !data.matchedAgent) {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'message message-bot';
+                resultDiv.innerHTML = `
+                    <div style="max-width:100%;">
+                        <div style="font-size:1.1rem; font-weight:600; margin-bottom:10px; color:#dc3545;">❌ Routing failed</div>
+                        <div style="background:#fff5f5; border:1px solid #feb2b2; border-radius:12px; padding:16px; color:#742a2a;">
+                            <div style="font-weight:600;">Error: ${escapeHtml(data.error || data.message || 'Unknown error')}</div>
+                            ${data.hint ? `<div style="margin-top:8px; font-size:0.9rem;">💡 ${escapeHtml(data.hint)}</div>` : ''}
+                        </div>
+                        <div style="font-size:0.75rem; color:#999; margin-top:8px;">${time}</div>
+                    </div>
+                `;
+                container.appendChild(resultDiv);
+                container.scrollTop = container.scrollHeight;
+                return;
+            }
+            
+            const priorityColor = data.issue.priority === 'critical' ? '#e53e3e' : 
+                                  data.issue.priority === 'high' ? '#dd6b20' : 
+                                  data.issue.priority === 'low' ? '#38a169' : '#3182ce';
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'message message-bot';
+            resultDiv.style.maxWidth = '100%';
+            resultDiv.innerHTML = `
+                <div style="font-family:system-ui, -apple-system, sans-serif; max-width:100%;">
+                    
+                    <!-- Matched Agent Card -->
+                    <div style="background:#ebf8ff; border:1px solid #bee3f8; border-radius:12px; padding:16px; margin-bottom:12px;">
+                        <div style="font-size:0.85rem; font-weight:700; color:#3182ce; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                            🎯 Matched Agent
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.6); border-radius:10px; padding:12px;">
+                            <div style="font-size:2.5rem;">${getAvatar(data.matchedAgent.role)}</div>
+                            <div>
+                                <div style="font-weight:700; color:#2d3748; font-size:1rem;">${data.matchedAgent.name}</div>
+                                <div style="font-size:0.85rem; color:#718096; margin-top:2px;">Role: ${data.matchedAgent.role}</div>
+                                <div style="font-size:0.8rem; color:#a0aec0; margin-top:1px;">Adapter: ${data.matchedAgent.adapterType}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Generated Issue Card -->
+                    <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:16px; margin-bottom:12px;">
+                        <div style="font-size:0.85rem; font-weight:700; color:#d69e2e; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                            📝 Generated Issue
+                        </div>
+                        <div style="background:rgba(255,255,255,0.7); border-radius:8px; padding:12px;">
+                            <div style="margin-bottom:8px;">
+                                <span style="font-weight:600; color:#4a5568;">Title:</span>
+                                <span style="color:#2d3748;">${escapeHtml(data.issue.title)}</span>
+                            </div>
+                            <div style="margin-bottom:8px;">
+                                <span style="font-weight:600; color:#4a5568;">Priority:</span>
+                                <span style="color:${priorityColor}; font-weight:700; text-transform:uppercase; font-size:0.85rem;">${data.issue.priority}</span>
+                            </div>
+                            <div>
+                                <span style="font-weight:600; color:#4a5568;">Status:</span>
+                                <span style="color:#718096;">${data.issue.status}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Routing Badge -->
+                    <div style="display:inline-block; background:#fed7e2; color:#97266d; padding:6px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; margin-bottom:12px;">
+                        🔀 Routed by keyword matching
+                    </div>
+                    
+                    <!-- Issue Created Card -->
+                    <div style="background:#f0fff4; border:1px solid #9ae6b4; border-radius:12px; padding:16px;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                            <div style="color:#38a169; font-size:1.2rem;">✓</div>
+                            <div style="font-weight:700; color:#276749;">Issue created successfully!</div>
+                        </div>
+                        
+                        <div style="background:white; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:10px;">
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                                <span style="font-size:1.2rem;">📋</span>
+                                <span style="font-weight:800; color:#667eea; font-size:1.1rem;">${data.issue.identifier}</span>
+                            </div>
+                            
+                            <div style="margin-bottom:6px;">
+                                <span style="font-weight:600; color:#4a5568; font-size:0.9rem;">Title:</span>
+                                <span style="color:#2d3748; font-size:0.9rem;">${escapeHtml(data.issue.title)}</span>
+                            </div>
+                            
+                            <div style="margin-bottom:6px;">
+                                <span style="font-weight:600; color:#4a5568; font-size:0.9rem;">Priority:</span>
+                                <span style="color:${priorityColor}; font-weight:700; text-transform:uppercase; font-size:0.85rem;">${data.issue.priority}</span>
+                            </div>
+                            
+                            <div style="margin-bottom:10px;">
+                                <span style="font-weight:600; color:#4a5568; font-size:0.9rem;">Status:</span>
+                                <span style="color:#718096; font-size:0.9rem;">${data.issue.status}</span>
+                            </div>
+                            
+                            <div style="background:#f7fafc; border-radius:8px; padding:10px; font-size:0.8rem; color:#718096; line-height:1.5;">
+                                ${escapeHtml(data.issue.description?.substring(0, 180) || '')}${(data.issue.description?.length || 0) > 180 ? '...' : ''}
+                            </div>
+                        </div>
+                        
+                        <!-- Status Polling -->
+                        <div id="status-${data.issue.id}" style="display:flex; align-items:center; gap:8px; padding:10px 14px; background:white; border-radius:8px; font-size:0.85rem; color:#666; font-style:italic;">
+                            <span style="font-size:1rem;">📋</span>
+                            <span>Backlog — waiting for agent to start</span>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size:0.75rem; color:#999; margin-top:10px;">${time}</div>
+                </div>
+            `;
+            
+            container.appendChild(resultDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function pollIssueStatus(issueId, identifier) {
+            const maxAttempts = 60;
+            let attempts = 0;
+            
+            const poll = async () => {
+                if (attempts >= maxAttempts) {
+                    const statusEl = document.getElementById(`status-${issueId}`);
+                    if (statusEl) statusEl.textContent = '⏳ Still in backlog — agent will pick this up soon';
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`${API_BASE}/issues/${identifier}`, {
+                        headers: {
+                            'Authorization': `Bearer ${AUTH_TOKEN}`
+                        }
+                    });
+                    
+                    if (!response.ok) throw new Error('Failed to fetch status');
+                    
+                    const issue = await response.json();
+                    const statusEl = document.getElementById(`status-${issueId}`);
+                    
+                    if (statusEl) {
+                        if (issue.status === 'done') {
+                            statusEl.innerHTML = '✅ <strong>Completed!</strong>';
+                            statusEl.style.color = '#28a745';
+                            
+                            // Show outputs if any
+                            if (issue.workProducts && issue.workProducts.length > 0) {
+                                showWorkProducts(issueId, issue.workProducts);
+                            }
+                            if (issue.planDocument) {
+                                showPlanDocument(issueId, issue.planDocument);
+                            }
+                            return;
+                        } else if (issue.status === 'in_progress') {
+                            statusEl.innerHTML = '🔄 <strong>In progress...</strong> Agent is working on it';
+                            statusEl.style.color = '#667eea';
+                        } else if (issue.status === 'blocked') {
+                            statusEl.innerHTML = '⚠️ <strong>Blocked</strong> — needs attention';
+                            statusEl.style.color = '#dc3545';
+                        } else if (issue.status === 'backlog') {
+                            statusEl.innerHTML = '📋 <strong>Backlog</strong> — waiting for agent to start';
+                            statusEl.style.color = '#666';
+                        } else {
+                            statusEl.textContent = `Status: ${issue.status}`;
+                        }
+                    }
+                    
+                    attempts++;
+                    setTimeout(poll, 10000); // Poll every 10 seconds
+                    
+                } catch (error) {
+                    console.error('Polling error:', error);
+                    attempts++;
+                    setTimeout(poll, 10000);
+                }
+            };
+            
+            poll();
+        }
+
+        function showWorkProducts(issueId, workProducts) {
+            const container = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString();
+            
+            const productsHtml = workProducts.map((wp, i) => `
+                <div style="margin-top:10px; padding:10px; background:#f8f9fa; border-radius:8px; border-left:3px solid #28a745;">
+                    <div style="font-weight:bold; color:#333;">${wp.title || `Deliverable ${i+1}`}</div>
+                    ${wp.url ? `<div style="margin-top:5px;"><a href="${wp.url}" style="color:#667eea;">📎 View Deliverable →</a></div>` : ''}
+                    ${wp.content ? `<div style="margin-top:5px; font-size:0.85em; color:#666; max-height:100px; overflow:auto;"><pre style="margin:0; white-space:pre-wrap;">${escapeHtml(wp.content.substring(0, 500))}${wp.content.length > 500 ? '...' : ''}</pre></div>` : ''}
+                </div>
+            `).join('');
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'message message-bot';
+            resultDiv.innerHTML = `
+                <div>
+                    <div>📦 <strong>Task Outputs</strong></div>
+                    <div class="routing-result">
+                        ${productsHtml}
+                    </div>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+            
+            container.appendChild(resultDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showPlanDocument(issueId, planDocument) {
+            const container = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString();
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'message message-bot';
+            resultDiv.innerHTML = `
+                <div>
+                    <div>📋 <strong>Agent's Plan</strong></div>
+                    <div class="routing-result">
+                        <div style="padding:10px; background:#f8f9fa; border-radius:8px; border-left:3px solid #667eea; font-size:0.9em;">
+                            <pre style="margin:0; white-space:pre-wrap; color:#333;">${escapeHtml(planDocument)}</pre>
+                        </div>
+                    </div>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+            
+            container.appendChild(resultDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const container = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = '<span></span><span></span><span></span>';
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+
+        function showError(message) {
+            const container = document.getElementById('chatMessages');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'message message-bot';
+            errorDiv.innerHTML = `
+                <div class="error-state">
+                    ❌ ${escapeHtml(message)}
+                </div>
+            `;
+            container.appendChild(errorDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        loadAgents();
+    </script>
+</body>
+</html>
