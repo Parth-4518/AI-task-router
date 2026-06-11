@@ -15,7 +15,6 @@ import { queryKeys } from "../lib/queryKeys";
 import { MetricCard } from "../components/MetricCard";
 import { EmptyState } from "../components/EmptyState";
 import { StatusIcon } from "../components/StatusIcon";
-
 import { ActivityRow } from "../components/ActivityRow";
 import { Identity } from "../components/Identity";
 import { timeAgo } from "../lib/timeAgo";
@@ -25,10 +24,9 @@ import { ActiveAgentsPanel } from "../components/ActiveAgentsPanel";
 import { ChartCard, RunActivityChart, PriorityChart, IssueStatusChart, SuccessRateChart } from "../components/ActivityCharts";
 import { PageSkeleton } from "../components/PageSkeleton";
 import type { Agent, Issue } from "@paperclipai/shared";
+import { AITaskRouterPanel } from "../components/AITaskRouterPanel";
 import { PluginSlotOutlet } from "@/plugins/slots";
-
 const DASHBOARD_ACTIVITY_LIMIT = 10;
-
 function getRecentIssues(issues: Issue[]): Issue[] {
   return [...issues]
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
@@ -42,55 +40,45 @@ export function Dashboard() {
   const seenActivityIdsRef = useRef<Set<string>>(new Set());
   const hydratedActivityRef = useRef(false);
   const activityAnimationTimersRef = useRef<number[]>([]);
-
   const { data: agents } = useQuery({
     queryKey: queryKeys.agents.list(selectedCompanyId!),
     queryFn: () => agentsApi.list(selectedCompanyId!),
     enabled: !!selectedCompanyId,
   });
-
   useEffect(() => {
     setBreadcrumbs([{ label: "Dashboard" }]);
   }, [setBreadcrumbs]);
-
   const { data, isLoading, error } = useQuery({
     queryKey: queryKeys.dashboard(selectedCompanyId!),
     queryFn: () => dashboardApi.summary(selectedCompanyId!),
     enabled: !!selectedCompanyId,
   });
-
   const { data: activity } = useQuery({
     queryKey: [...queryKeys.activity(selectedCompanyId!), { limit: DASHBOARD_ACTIVITY_LIMIT }],
     queryFn: () => activityApi.list(selectedCompanyId!, { limit: DASHBOARD_ACTIVITY_LIMIT }),
     enabled: !!selectedCompanyId,
   });
-
   const { data: issues } = useQuery({
     queryKey: queryKeys.issues.list(selectedCompanyId!),
     queryFn: () => issuesApi.list(selectedCompanyId!),
     enabled: !!selectedCompanyId,
   });
-
   const { data: projects } = useQuery({
     queryKey: queryKeys.projects.list(selectedCompanyId!),
     queryFn: () => projectsApi.list(selectedCompanyId!),
     enabled: !!selectedCompanyId,
   });
-
   const { data: companyMembers } = useQuery({
     queryKey: queryKeys.access.companyUserDirectory(selectedCompanyId!),
     queryFn: () => accessApi.listUserDirectory(selectedCompanyId!),
     enabled: !!selectedCompanyId,
   });
-
   const userProfileMap = useMemo(
     () => buildCompanyUserProfileMap(companyMembers?.users),
     [companyMembers?.users],
   );
-
   const recentIssues = issues ? getRecentIssues(issues) : [];
   const recentActivity = useMemo(() => (activity ?? []).slice(0, 10), [activity]);
-
   useEffect(() => {
     for (const timer of activityAnimationTimersRef.current) {
       window.clearTimeout(timer);
@@ -100,33 +88,26 @@ export function Dashboard() {
     hydratedActivityRef.current = false;
     setAnimatedActivityIds(new Set());
   }, [selectedCompanyId]);
-
   useEffect(() => {
     if (recentActivity.length === 0) return;
-
     const seen = seenActivityIdsRef.current;
     const currentIds = recentActivity.map((event) => event.id);
-
     if (!hydratedActivityRef.current) {
       for (const id of currentIds) seen.add(id);
       hydratedActivityRef.current = true;
       return;
     }
-
     const newIds = currentIds.filter((id) => !seen.has(id));
     if (newIds.length === 0) {
       for (const id of currentIds) seen.add(id);
       return;
     }
-
     setAnimatedActivityIds((prev) => {
       const next = new Set(prev);
       for (const id of newIds) next.add(id);
       return next;
     });
-
     for (const id of newIds) seen.add(id);
-
     const timer = window.setTimeout(() => {
       setAnimatedActivityIds((prev) => {
         const next = new Set(prev);
@@ -137,7 +118,6 @@ export function Dashboard() {
     }, 980);
     activityAnimationTimersRef.current.push(timer);
   }, [recentActivity]);
-
   useEffect(() => {
     return () => {
       for (const timer of activityAnimationTimersRef.current) {
@@ -145,13 +125,11 @@ export function Dashboard() {
       }
     };
   }, []);
-
   const agentMap = useMemo(() => {
     const map = new Map<string, Agent>();
     for (const a of agents ?? []) map.set(a.id, a);
     return map;
   }, [agents]);
-
   const entityNameMap = useMemo(() => {
     const map = new Map<string, string>();
     for (const i of issues ?? []) map.set(`issue:${i.id}`, i.identifier ?? i.id.slice(0, 8));
@@ -159,18 +137,15 @@ export function Dashboard() {
     for (const p of projects ?? []) map.set(`project:${p.id}`, p.name);
     return map;
   }, [issues, agents, projects]);
-
   const entityTitleMap = useMemo(() => {
     const map = new Map<string, string>();
     for (const i of issues ?? []) map.set(`issue:${i.id}`, i.title);
     return map;
   }, [issues]);
-
   const agentName = (id: string | null) => {
     if (!id || !agents) return null;
     return agents.find((a) => a.id === id)?.name ?? null;
   };
-
   if (!selectedCompanyId) {
     if (companies.length === 0) {
       return (
@@ -186,17 +161,13 @@ export function Dashboard() {
       <EmptyState icon={LayoutDashboard} message="Create or select a company to view the dashboard." />
     );
   }
-
   if (isLoading) {
     return <PageSkeleton variant="dashboard" />;
   }
-
   const hasNoAgents = agents !== undefined && agents.length === 0;
-
   return (
     <div className="space-y-6">
       {error && <p className="text-sm text-destructive">{error.message}</p>}
-
       {hasNoAgents && (
         <div className="flex items-center justify-between gap-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 dark:border-amber-500/25 dark:bg-amber-950/60">
           <div className="flex items-center gap-2.5">
@@ -213,30 +184,27 @@ export function Dashboard() {
           </button>
         </div>
       )}
-
       <ActiveAgentsPanel companyId={selectedCompanyId!} />
-
       {data && (
         <>
           {data.budgets.activeIncidents > 0 ? (
-            <div className="flex items-start justify-between gap-3 rounded-xl border border-destructive/20 bg-[linear-gradient(180deg,color-mix(in_oklab,hsl(var(--destructive))_12%,transparent),color-mix(in_oklab,hsl(var(--background))_2%,transparent))] px-4 py-3">
+            <div className="flex items-start justify-between gap-3 rounded-xl border border-red-500/20 bg-[linear-gradient(180deg,rgba(255,80,80,0.12),rgba(255,255,255,0.02))] px-4 py-3">
               <div className="flex items-start gap-2.5">
-                <PauseCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive/80" />
+                <PauseCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-300" />
                 <div>
-                  <p className="text-sm font-medium text-destructive-foreground">
+                  <p className="text-sm font-medium text-red-50">
                     {data.budgets.activeIncidents} active budget incident{data.budgets.activeIncidents === 1 ? "" : "s"}
                   </p>
-                  <p className="text-xs text-destructive-foreground/70">
+                  <p className="text-xs text-red-100/70">
                     {data.budgets.pausedAgents} agents paused · {data.budgets.pausedProjects} projects paused · {data.budgets.pendingApprovals} pending budget approvals
                   </p>
                 </div>
               </div>
-              <Link to="/costs" className="text-sm underline underline-offset-2 text-destructive-foreground/80">
+              <Link to="/costs" className="text-sm underline underline-offset-2 text-red-100">
                 Open budgets
               </Link>
             </div>
           ) : null}
-
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-1 sm:gap-2">
             <MetricCard
               icon={Bot}
@@ -290,7 +258,6 @@ export function Dashboard() {
               }
             />
           </div>
-
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <ChartCard title="Run Activity" subtitle="Last 14 days">
               <RunActivityChart activity={data.runActivity} />
@@ -305,14 +272,12 @@ export function Dashboard() {
               <SuccessRateChart activity={data.runActivity} />
             </ChartCard>
           </div>
-
           <PluginSlotOutlet
             slotTypes={["dashboardWidget"]}
             context={{ companyId: selectedCompanyId }}
             className="grid gap-4 md:grid-cols-2"
             itemClassName="rounded-lg border bg-card p-4 shadow-sm"
           />
-
           <div className="grid md:grid-cols-2 gap-4">
             {/* Recent Activity */}
             {recentActivity.length > 0 && (
@@ -335,7 +300,6 @@ export function Dashboard() {
                 </div>
               </div>
             )}
-
             {/* Recent Tasks */}
             <div className="min-w-0">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
@@ -358,7 +322,6 @@ export function Dashboard() {
                         <span className="shrink-0 sm:hidden">
                           <StatusIcon status={issue.status} blockerAttention={issue.blockerAttention} />
                         </span>
-
                         {/* Right column on mobile: title + metadata stacked */}
                         <span className="flex min-w-0 flex-1 flex-col gap-1 sm:contents">
                           <span className="line-clamp-2 text-sm sm:order-2 sm:flex-1 sm:min-w-0 sm:line-clamp-none sm:truncate">
@@ -388,9 +351,9 @@ export function Dashboard() {
               )}
             </div>
           </div>
-
         </>
       )}
+      <AITaskRouterPanel companyId={selectedCompanyId} />
     </div>
   );
 }
